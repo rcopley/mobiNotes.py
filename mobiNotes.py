@@ -57,23 +57,16 @@ def connectImap(configFile):
 	connection.login(username, password)
 	return connection
 
-def countNotes(connection, configFile):
-	#c = connectImap(configFile)
+def countNotes(connection):
 	try:
 		typ, data = connection.select('Notes', readonly=True)
 		nbMsgs = int(data[0])
 		print 'You have %d available notes.' % nbMsgs
 	finally:
-		print "leaving"
-		# try:
-		# 	connection.close()
-		# except:
-		# 	pass
-		# connection.logout()
+		pass
 	return
 
-def listNotes(connection, configFile):
-	#c = connectImap(configFile)
+def listNotes(connection):
 	try:
 		typ, data = connection.select('Notes', readonly=True)
 		typ, [ids] = connection.search(None, 'ALL')
@@ -83,15 +76,10 @@ def listNotes(connection, configFile):
 				if isinstance(d, tuple):
 					msg = email.message_from_string(d[1])
 					print msg['subject']
-	finally:
-		# try:
-		# 	connection.close()
-		# except:
-		# 	pass
-		# connection.logout()
+	except:
+		print "An Error occured while listing notes"
 	return
-def searchNotes(connection, configFile, queryString, stripHtml):
-	#c = connectImap(configFile)
+def searchNotes(connection, queryString, stripHtml):
 	try:
 		typ, data = c.select('Notes', readonly=True)
 		query = '(OR TEXT "%s" SUBJECT "%s")' % (queryString, queryString)
@@ -110,16 +98,11 @@ def searchNotes(connection, configFile, queryString, stripHtml):
 				print removeHTMLTags(data[1][1])
 			else:
 				print data[1][1]
-	finally:
-		# try:
-		# 	c.close()
-		# except:
-		# 	pass
-		# c.logout()
+	except:
+		print "An error occured while searching notes."
 	return
 
 def createNote(connection, configFile, subject,savehtml):
-	#c = connectImap(configFile)
 
 	pattern = '(\d{4})-(0[1-9]|1[0-2]|[1-9])-(\3([12]\d|0[1-9]|3[01])|[1-9])[tT\s]([01]\d|2[0-3‌​])\:(([0-5]\d)|\d)\:(([0-5]\d)|\d)\t'
 
@@ -146,12 +129,7 @@ def createNote(connection, configFile, subject,savehtml):
 		c.append('Notes', '', imaplib.Time2Internaldate(time.time()), str(note))
 		
 	finally:
-		# try:
-		# 	c.close()
-		# except:
-		# 	pass
-		# c.logout()
-	
+		pass	
 	return
 
 def main(argv):
@@ -191,16 +169,17 @@ def main(argv):
 	connection = connectImap(configFile)
 
 	if options.count == True:
-		countNotes(connection, configFile)
+		countNotes(connection)
 	elif options.list == True:
-		listNotes(connection, configFile)
+		listNotes(connection)
 	elif options.query != None:
-		searchNotes(connection, configFile, options.query, options.stripHtml)
+		searchNotes(connection, options.query, options.stripHtml)
 	else:
 		createNote(connection, configFile, options.subject, options.saveHtml)
 
 	# Wrapping up
 	try:
+		print "Closing connection"
 		connection.close()
 	except:
 		pass
