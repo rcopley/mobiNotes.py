@@ -1,4 +1,8 @@
 [server]
 hostname: imap.mail.me.com
-username: <your_icloud_login>
-password: <your_icloud_password>
+
+#enter the username for your iCloud email address (e.g. joeuser)
+username: 
+
+#leave this password line blank to be prompted for a password at runtime
+password: 
