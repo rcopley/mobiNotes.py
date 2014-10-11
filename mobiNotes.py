@@ -64,11 +64,12 @@ def countNotes(connection, configFile):
 		nbMsgs = int(data[0])
 		print 'You have %d available notes.' % nbMsgs
 	finally:
-		try:
-			connection.close()
-		except:
-			pass
-		connection.logout()
+		print "leaving"
+		# try:
+		# 	connection.close()
+		# except:
+		# 	pass
+		# connection.logout()
 	return
 
 def listNotes(connection, configFile):
@@ -83,11 +84,11 @@ def listNotes(connection, configFile):
 					msg = email.message_from_string(d[1])
 					print msg['subject']
 	finally:
-		try:
-			connection.close()
-		except:
-			pass
-		connection.logout()
+		# try:
+		# 	connection.close()
+		# except:
+		# 	pass
+		# connection.logout()
 	return
 def searchNotes(connection, configFile, queryString, stripHtml):
 	#c = connectImap(configFile)
@@ -110,11 +111,11 @@ def searchNotes(connection, configFile, queryString, stripHtml):
 			else:
 				print data[1][1]
 	finally:
-		try:
-			c.close()
-		except:
-			pass
-		c.logout()
+		# try:
+		# 	c.close()
+		# except:
+		# 	pass
+		# c.logout()
 	return
 
 def createNote(connection, configFile, subject,savehtml):
@@ -145,11 +146,11 @@ def createNote(connection, configFile, subject,savehtml):
 		c.append('Notes', '', imaplib.Time2Internaldate(time.time()), str(note))
 		
 	finally:
-		try:
-			c.close()
-		except:
-			pass
-		c.logout()
+		# try:
+		# 	c.close()
+		# except:
+		# 	pass
+		# c.logout()
 	
 	return
 
@@ -197,6 +198,13 @@ def main(argv):
 		searchNotes(connection, configFile, options.query, options.stripHtml)
 	else:
 		createNote(connection, configFile, options.subject, options.saveHtml)
+
+	# Wrapping up
+	try:
+		connection.close()
+	except:
+		pass
+	connection.logout()
 
 if __name__ == '__main__':
 	main(sys.argv[1:])
