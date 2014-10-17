@@ -11,6 +11,10 @@ Instructions
 ------------
 To run this application, execute `mobiNotes.py` from the commandline, you must specify an input file with the `-f` option
 
+Example
+-------
+    mobiNotes.py -f ~/notes.txt
+
 Features
 --------
 * Search for existing notes
