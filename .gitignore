@@ -11,3 +11,7 @@ Thumbs.db
 # Filled config files #
 #######################
 *.cfg
+
+# Compiled files #
+##################
+*.pyc

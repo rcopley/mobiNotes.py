@@ -17,12 +17,17 @@ import sys
 import time
 import getpass
 import re
+import calendar
+import uuid
 from optparse import OptionParser
 from HTMLParser import HTMLParser
+import filePrep
+from filePrep import loadNotes
+from filePrep import note
 
 global debug 
 global configFile
-configFile = 'inotes.conf'
+configFile = './inotes.cfg'
 
 class MLStripper(HTMLParser):
 	def __init__(self):
@@ -74,6 +79,7 @@ def listNotes(connection):
 			typ, data = connection.fetch(id, '(RFC822)')
 			for d in data:
 				if isinstance(d, tuple):
+					print '\n\n'+str(d)+'\n\n'
 					msg = email.message_from_string(d[1])
 					print msg['subject']
 	except:
@@ -102,10 +108,7 @@ def searchNotes(connection, queryString, stripHtml):
 		print "An error occured while searching notes."
 	return
 
-def createNote(connection, configFile, subject,savehtml):
-
-	pattern = '(\d{4})-(0[1-9]|1[0-2]|[1-9])-(\3([12]\d|0[1-9]|3[01])|[1-9])[tT\s]([01]\d|2[0-3‌​])\:(([0-5]\d)|\d)\:(([0-5]\d)|\d)\t'
-
+def createNote(connection, configFile, noteInstance, savehtml):
 	try:
 		# Read configuration file
 		config = ConfigParser.ConfigParser()
@@ -115,24 +118,38 @@ def createNote(connection, configFile, subject,savehtml):
 		if debug: print "+++ Type your note and exit with CTRL-D"
 		if savehtml:
 			body = '<html>\n<head></head>\n<body>'
-			for line in sys.stdin.readlines():
-				body += line
-				body += '<br>'
+			body += noteInstance.content.replace('\n','\n<br>')
+			#for line in sys.stdin.readlines():
+			#	body += line
+			#	body += '<br>'
 			body += '</body></html>'
 		else:
-			body = ''
-			for line in sys.stdin.readlines():
-				body += line
+			body = noteInstance.content
 
-		now = time.strftime('%a, %d %b %Y %H:%M:%S %z')
-		note = "Date: %s\nFrom: %s@me.com\nX-Uniform-Type-Identifier: com.apple.mail-note\nContent-Type: text/html;\nSubject: %s\n\n%s" % (now, username, subject, body)
-		c.append('Notes', '', imaplib.Time2Internaldate(time.time()), str(note))
+		#createdTimestamp = noteInstance.created
+		createdTimestamp = time.strftime('%a, %d %b %Y %H:%M:%S +0000', time.gmtime(noteInstance.created))
+		#createdTimestamp = time.strftime('%d-%b-%Y %H:%M:%S +0000', time.gmtime(now))
+		print createdTimestamp
+		#note = "Content-Type: text/html;\ncharset=utf-8\nDate: %s\nFrom: %s@me.com\nX-Uniform-Type-Identifier: com.apple.mail-note\nX-Universally-Unique-Identifier: %s\nSubject: %s\n\n%s" % (createdTimestamp, username, str(uuid.uuid4()), noteInstance.subject, body)
+		note = "Content-Type: text/html;\nDate: %s\nFrom: %s@me.com\nX-Uniform-Type-Identifier: com.apple.mail-note\nX-Universally-Unique-Identifier: %s\nSubject: %s\n\n%s" % (createdTimestamp, username, str(uuid.uuid4()), noteInstance.subject, body)
+		if debug:
+			print "+++ message is: "
+			print note
+		#connection.append('Notes', '', imaplib.Time2Internaldate(time.time()), str(note))
+		#noteInstance.modified
+		r = connection.append('Notes', '', imaplib.Time2Internaldate(noteInstance.modified), str(note))
+		if r[0] != 'OK':
+			print 'An error occured uploading your note:'
+			print str(r[0])+': '+str(r[1])
+		else:
+			print 'Message uploaded successfully!'
 		
 	finally:
 		pass	
 	return
 
 def main(argv):
+	#TODO: Consolidate script
 	global debug
 	global configFile
 	debug = 0
@@ -154,6 +171,8 @@ def main(argv):
 		help='create a new note with subject')
 	parser.add_option('-S', '--striphtml', action='store_true', dest='stripHtml', \
 		help='remove HTML tags from displayed notes')
+	parser.add_option('-f', '--file', dest='filename', \
+		help='specifies the file to use for bulk note import')
 	(options, args) = parser.parse_args()
 	if options.debug == True:
 		debug = 1
@@ -175,7 +194,9 @@ def main(argv):
 	elif options.query != None:
 		searchNotes(connection, options.query, options.stripHtml)
 	else:
-		createNote(connection, configFile, options.subject, options.saveHtml)
+		notes = loadNotes(options.filename)
+		for n in notes:
+			createNote(connection, configFile, n, options.saveHtml)
 
 	# Wrapping up
 	try:
