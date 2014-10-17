@@ -33,7 +33,8 @@ Command Line Options
                             specify the configuration file
       -C, --count           count the number of notes
       -d, --debug           display this message
-      -H, --html            save the new note in HTML format
+      -H, --html            save the new note in HTML format (default)
+      -p, --plain           save the new note in HTML format (negates -H)
       -l, --list            list saved notes
       -q QUERY, --query=QUERY
                             search fo keyword in saved notes
