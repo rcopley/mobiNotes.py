@@ -161,8 +161,10 @@ def main(argv):
 		help='count the number of notes')
 	parser.add_option('-d', '--debug', action='store_true', dest='debug', \
 		help='display this message', default='False')
-	parser.add_option('-H', '--html', action='store_true', dest='saveHtml', \
-		help='save the new note in HTML format')
+	parser.add_option('-H', '--html', action='store_true', dest='saveHtml', default=True, \
+		help='save the new note in HTML format (default)')
+	parser.add_option('-p', '--plain', action='store_false', dest='saveHtml', \
+		help='save the new note in HTML format (negates -H)')
 	parser.add_option('-l', '--list', action='store_true', dest='list', \
 		help='list saved notes')
 	parser.add_option('-q', '--query', dest='query', type='string', \
