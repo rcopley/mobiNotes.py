@@ -51,6 +51,9 @@ def connectImap(configFile):
 	username = config.get('server', 'username')
 	password = config.get('server', 'password')
 
+	if username == '':
+		print "No username was specified in the config file, please enter the username for your iCloud account. For example, if you login with joe@icloud.com, enter 'joe'."
+		username = raw_input('iCloud Username: ')
 	if password == '': password = getpass.getpass('iCloud Password: ')
 
 	# Open an IMAP connection
@@ -149,7 +152,6 @@ def createNote(connection, configFile, noteInstance, savehtml):
 	return
 
 def main(argv):
-	#TODO: Consolidate script
 	global debug
 	global configFile
 	debug = 0

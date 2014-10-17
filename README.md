@@ -13,7 +13,11 @@ To run this application, execute `mobiNotes.py` from the commandline, you must s
 
 Example
 -------
+To run this application, you must create the config file needed to login to iCloud. You can copy or rename the sample config file `inotes.cfg.sample` to `inotes.cfg` to get started right away. Entering your username and password into the configuration file is optional. It is recommended that you do not enter your password into the config file, unless neccesarry. If you do not enter a username and/or password in the config file, you will be prompted for it when you run the script.
     mobiNotes.py -f ~/notes.txt
+
+You can specify the config file for the script to use with the `-c` switch. For example:
+    mobiNotes.py -c myawesomeconfig.cfg -f ~/notes.txt
 
 Features
 --------
